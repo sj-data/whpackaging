@@ -3,6 +3,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import io
 from PIL import Image
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG, filename='/var/www/packaging/whpackaging/debug.log', filemode='w',
+                    format='%(name)s - %(levelname)s - %(message)s')
 
 # Initialize an empty DataFrame for package sizes
 package_data = pd.DataFrame(columns=["Package Name", "Width", "Height", "Depth", "Quantity"])
@@ -10,6 +15,7 @@ package_data = pd.DataFrame(columns=["Package Name", "Width", "Height", "Depth",
 
 def add_package(package_name, width, height, depth, quantity):
     global package_data
+    logging.debug(f"Adding package: {package_name}, {width}, {height}, {depth}, {quantity}")
     new_package = pd.DataFrame([{
         "Package Name": package_name,
         "Width": width,
@@ -18,6 +24,7 @@ def add_package(package_name, width, height, depth, quantity):
         "Quantity": quantity
     }])
     package_data = pd.concat([package_data, new_package], ignore_index=True)
+    logging.debug(f"Updated package data: \n{package_data}")
     return package_data
 
 
@@ -90,8 +97,8 @@ def plan_pallet(height_limit, pallet_width=100, pallet_depth=100):
         images.append(img)
 
         # Debug: Print remaining packages before updating
-        print("Remaining packages before updating quantities:")
-        print(remaining_packages)
+        logging.debug("Remaining packages before updating quantities:")
+        logging.debug(f"\n{remaining_packages}")
 
         # Update quantities of remaining packages
         for package in layer_packages:
@@ -105,8 +112,8 @@ def plan_pallet(height_limit, pallet_width=100, pallet_depth=100):
                 remaining_packages.reset_index(drop=True, inplace=True)
 
         # Debug: Print remaining packages after updating
-        print("Remaining packages after updating quantities:")
-        print(remaining_packages)
+        logging.debug("Remaining packages after updating quantities:")
+        logging.debug(f"\n{remaining_packages}")
 
     return images
 
